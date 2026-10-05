@@ -168,6 +168,7 @@ func (a *App) handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/hls/", http.StripPrefix("/hls", a.proxy))
 	mux.HandleFunc("/api/status", a.handleStatus)
+	mux.HandleFunc("/api/stream-info", a.handleStreamInfo)
 	mux.HandleFunc("/api/start", a.handleStart)
 	mux.HandleFunc("/api/stop", a.handleStop)
 	mux.Handle("/", a.webHandler())
@@ -199,6 +200,87 @@ func (a *App) handleStatus(w http.ResponseWriter, r *http.Request) {
 		"rtmp_play":  fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.StreamKey),
 		"srs_binary": a.manager.binaryPath(),
 	})
+}
+
+func (a *App) handleStreamInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	key := a.cfg.StreamKey
+	resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d/api/v1/streams/", a.cfg.HLSPort))
+	if err != nil {
+		_ = json.NewEncoder(w).Encode(map[string]any{"error": err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+	var data map[string]any
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		_ = json.NewEncoder(w).Encode(map[string]any{"error": err.Error()})
+		return
+	}
+	streams, ok := data["streams"].([]any)
+	if !ok {
+		_ = json.NewEncoder(w).Encode(map[string]any{})
+		return
+	}
+	for _, s := range streams {
+		stream, ok := s.(map[string]any)
+		if !ok {
+			continue
+		}
+		name, _ := stream["name"].(string)
+		if name != key {
+			continue
+		}
+		vcodec := ""
+		acodec := ""
+		width := 0
+		height := 0
+		fps := 0.0
+		bitrate := 0
+		if v, ok := stream["video"].(map[string]any); ok {
+			if c, ok := v["codec"].(string); ok {
+				vcodec = c
+			}
+			if w, ok := v["width"].(float64); ok {
+				width = int(w)
+			}
+			if h, ok := v["height"].(float64); ok {
+				height = int(h)
+			}
+			if f, ok := v["fps"].(float64); ok {
+				fps = f
+			}
+			if b, ok := v["bitrate"].(float64); ok {
+				bitrate = int(b)
+			}
+		}
+		if a, ok := stream["audio"].(map[string]any); ok {
+			if c, ok := a["codec"].(string); ok {
+				acodec = c
+			}
+		}
+		resolution := fmt.Sprintf("%dx%d", width, height)
+		if width == 0 || height == 0 {
+			resolution = "—"
+		}
+		fpsStr := "—"
+		if fps > 0 {
+			fpsStr = fmt.Sprintf("%.0f", fps)
+		}
+		bitrateStr := "—"
+		if bitrate > 0 {
+			bitrateStr = fmt.Sprintf("%.1f Mbps", float64(bitrate)/1e6)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"resolution": resolution,
+			"fps":        fpsStr,
+			"vcodec":     vcodec,
+			"acodec":     acodec,
+			"bitrate":    bitrateStr,
+		})
+		return
+	}
+	_ = json.NewEncoder(w).Encode(map[string]any{})
 }
 
 func (a *App) handleStart(w http.ResponseWriter, r *http.Request) {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTMP Web</title>
+  <title>Astra Node</title>
   <link rel="stylesheet" href="styles.css">
   <script src="hls.min.js"></script>
   <script src="app.js" defer></script>
@@ -11,89 +11,122 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">CAPTURA LOCAL</p>
-        <h1>RTMP Web</h1>
-        <p class="subtitle">Señal de la DJI Osmo en tu navegador</p>
+      <div class="brand">
+        <img src="Astra Node Logo.png" alt="" class="logo" width="40" height="40" aria-hidden="true">
+        <div>
+          <h1>Astra Node</h1>
+          <p class="subtitle">Tu señal Osmo, en el navegador</p>
+        </div>
       </div>
-      <div id="serviceState" class="state state-loading"><span></span><strong>Comprobando</strong></div>
+      <div id="serviceState" class="state state-loading" aria-live="polite">
+        <span class="state-dot"></span>
+        <strong>Comprobando servidor…</strong>
+      </div>
     </header>
 
-    <section class="player-card">
+    <section class="player-section">
       <div class="video-wrap">
         <video id="player" controls autoplay muted playsinline></video>
-        <div id="videoMessage" class="video-message">Esperando señal de la Osmo…</div>
+        <div id="videoMessage" class="video-message" aria-live="polite">Esperando señal de la Osmo…</div>
       </div>
       <div class="player-footer">
-        <div>
-          <strong id="streamTitle">Sin stream</strong>
+        <div class="stream-info">
+          <strong id="streamTitle">Sin stream activo</strong>
           <span id="streamMeta">Configura la Osmo para comenzar</span>
         </div>
+        <div id="streamDetails" class="stream-details" hidden>
+          <span class="detail"><span class="detail-label">Resolución:</span><span id="detailResolution" class="detail-value">—</span></span>
+          <span class="detail"><span class="detail-label">FPS:</span><span id="detailFps" class="detail-value">—</span></span>
+          <span class="detail"><span class="detail-label">Video:</span><span id="detailVcodec" class="detail-value">—</span></span>
+          <span class="detail"><span class="detail-label">Audio:</span><span id="detailAcodec" class="detail-value">—</span></span>
+          <span class="detail"><span class="detail-label">Bitrate:</span><span id="detailBitrate" class="detail-value">—</span></span>
+        </div>
         <div class="actions">
-          <button id="startButton" class="button primary">Iniciar servidor</button>
-          <button id="stopButton" class="button" disabled>Detener</button>
+          <button id="startButton" class="btn btn-primary">Iniciar servidor</button>
+          <button id="stopButton" class="btn" disabled>Detener</button>
         </div>
       </div>
     </section>
 
     <section class="grid">
-      <article class="card">
-        <div class="card-heading">
-          <div>
-            <p class="eyebrow">OSMO POCKET 3</p>
-            <h2>Configura la publicación</h2>
+      <article class="card card-publish">
+        <header class="card-header">
+          <div class="card-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>
+              <h2>Publicar desde la Osmo</h2>
+              <p class="card-subtitle">RTMP ingest</p>
+            </div>
           </div>
           <span class="pill">H.264 · 1080p60</span>
-        </div>
+        </header>
         <p class="help">En la cámara usa estos datos. La clave identifica tu stream y no necesitas cambiarla.</p>
-        <label>Servidor RTMP</label>
-        <div class="copy-row"><input id="serverUrl" readonly><button data-copy="serverUrl">Copiar</button></div>
-        <label>Stream key</label>
-        <div class="copy-row"><input id="streamKey" readonly><button data-copy="streamKey">Copiar</button></div>
-        <div class="settings">
-          <span><b>Resolución</b> 1920 × 1080</span>
-          <span><b>FPS</b> 60</span>
-          <span><b>Video</b> H.264</span>
-          <span><b>Audio</b> AAC</span>
-          <span><b>Bitrate</b> 12–16 Mbps</span>
-          <span><b>GOP</b> 1–2 s</span>
+        <label for="serverUrl">Servidor RTMP</label>
+        <div class="copy-row"><input id="serverUrl" readonly><button class="btn-copy" data-copy="serverUrl" aria-label="Copiar servidor RTMP">Copiar</button></div>
+        <label for="streamKey">Stream key</label>
+        <div class="copy-row"><input id="streamKey" readonly><button class="btn-copy" data-copy="streamKey" aria-label="Copiar stream key">Copiar</button></div>
+        <div class="presets">
+          <span class="preset"><b>Resolución</b> 1920 × 1080</span>
+          <span class="preset"><b>FPS</b> 60</span>
+          <span class="preset"><b>Video</b> H.264</span>
+          <span class="preset"><b>Audio</b> AAC</span>
+          <span class="preset"><b>Bitrate</b> 12–16 Mbps</span>
+          <span class="preset"><b>GOP</b> 1–2 s</span>
         </div>
       </article>
 
-      <article class="card">
-        <div class="card-heading">
-          <div>
-            <p class="eyebrow">OBS / VLC</p>
-            <h2>Recibe la señal</h2>
+      <article class="card card-receive">
+        <header class="card-header">
+          <div class="card-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div>
+              <h2>Recibir en OBS / VLC</h2>
+              <p class="card-subtitle">RTMP playback · HLS</p>
+            </div>
           </div>
-          <span class="pill green">Salida local</span>
-        </div>
+          <span class="pill pill-green">Salida local</span>
+        </header>
         <p class="help">En OBS añade una fuente <b>VLC Video Source</b> y pega esta URL RTMP.</p>
-        <label>URL RTMP de reproducción</label>
-        <div class="copy-row"><input id="playUrl" readonly><button data-copy="playUrl">Copiar</button></div>
-        <label>URL HLS del navegador</label>
-        <div class="copy-row"><input id="hlsUrl" readonly><button data-copy="hlsUrl">Copiar</button></div>
+        <label for="playUrl">URL RTMP de reproducción</label>
+        <div class="copy-row"><input id="playUrl" readonly><button class="btn-copy" data-copy="playUrl" aria-label="Copiar URL RTMP">Copiar</button></div>
+        <label for="hlsUrl">URL HLS del navegador</label>
+        <div class="copy-row"><input id="hlsUrl" readonly><button class="btn-copy" data-copy="hlsUrl" aria-label="Copiar URL HLS">Copiar</button></div>
         <p class="tip">La URL HLS también se puede abrir directamente en VLC.</p>
       </article>
     </section>
 
-    <section class="card status-card">
-      <div class="card-heading">
-        <div>
-          <p class="eyebrow">ESTADO</p>
-          <h2>Diagnóstico</h2>
+    <section class="card card-status">
+      <header class="card-header">
+        <div class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          <div>
+            <h2>Estado del servidor</h2>
+            <p class="card-subtitle">Diagnóstico en tiempo real</p>
+          </div>
         </div>
-        <button id="refreshButton" class="button subtle">Actualizar</button>
-      </div>
+        <button id="refreshButton" class="btn btn-subtle">Actualizar</button>
+      </header>
       <div class="status-grid">
-        <div><span>Servidor SRS</span><strong id="srsStatus">—</strong></div>
-        <div><span>stream key</span><strong id="keyStatus">—</strong></div>
-        <div><span>IP del equipo</span><strong id="ipStatus">Detectando…</strong></div>
-        <div><span>Último error</span><strong id="errorStatus">—</strong></div>
+        <div class="status-item">
+          <span class="status-label">Servidor SRS</span>
+          <strong id="srsStatus" class="status-value">—</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Stream key</span>
+          <strong id="keyStatus" class="status-value">—</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">IP del equipo</span>
+          <strong id="ipStatus" class="status-value">Detectando…</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Último error</span>
+          <strong id="errorStatus" class="status-value">—</strong>
+        </div>
       </div>
     </section>
 
-    <footer>RTMP Web · Funciona en la red local · Sin cuentas ni servicios externos</footer>
+    <footer>Astra Node · Local-first · Sin cuentas ni servicios externos</footer>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
