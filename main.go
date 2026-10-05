@@ -30,11 +30,12 @@ import (
 var webFiles embed.FS
 
 type Config struct {
-	RTMPPort  int    `json:"rtmp_port"`
-	HLSPort   int    `json:"hls_port"`
-	WebPort   int    `json:"web_port"`
-	StreamKey string `json:"stream_key"`
-	SRSBinary string `json:"srs_binary"`
+	RTMPPort   int    `json:"rtmp_port"`
+	HLSPort    int    `json:"hls_port"`
+	WebPort    int    `json:"web_port"`
+	StreamKey  string `json:"stream_key"`
+	DroneKey   string `json:"drone_key"`
+	SRSBinary  string `json:"srs_binary"`
 }
 
 type Paths struct {
@@ -69,6 +70,7 @@ func main() {
 	var hlsPort int
 	var webPort int
 	var streamKey string
+	var droneKey string
 	var srsBinary string
 	var openBrowser bool
 
@@ -78,6 +80,7 @@ func main() {
 	flag.IntVar(&hlsPort, "hls-port", 0, "puerto HLS interno")
 	flag.IntVar(&webPort, "web-port", 0, "puerto de la aplicación web")
 	flag.StringVar(&streamKey, "stream-key", "", "stream key de la Osmo")
+	flag.StringVar(&droneKey, "drone-key", "", "stream key del dron")
 	flag.StringVar(&srsBinary, "srs", "", "ruta al ejecutable SRS")
 	flag.BoolVar(&openBrowser, "open", true, "abrir la interfaz en el navegador")
 	flag.Parse()
@@ -97,6 +100,9 @@ func main() {
 	}
 	if strings.TrimSpace(streamKey) != "" {
 		cfg.StreamKey = strings.TrimSpace(streamKey)
+	}
+	if strings.TrimSpace(droneKey) != "" {
+		cfg.DroneKey = strings.TrimSpace(droneKey)
 	}
 	if strings.TrimSpace(srsBinary) != "" {
 		cfg.SRSBinary = strings.TrimSpace(srsBinary)
@@ -191,14 +197,18 @@ func (a *App) handleStatus(w http.ResponseWriter, r *http.Request) {
 		host = "<IP_DEL_PC>"
 	}
 	_ = json.NewEncoder(w).Encode(map[string]any{
-		"running":    a.manager.isRunning(),
-		"error":      a.manager.getError(),
-		"stream_key": a.cfg.StreamKey,
-		"local_ip":   localIP(),
-		"ingest_url": fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.StreamKey),
-		"hls_url":    fmt.Sprintf("http://127.0.0.1:%d/hls/live/%s.m3u8", a.cfg.WebPort, a.cfg.StreamKey),
-		"rtmp_play":  fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.StreamKey),
-		"srs_binary": a.manager.binaryPath(),
+		"running":     a.manager.isRunning(),
+		"error":       a.manager.getError(),
+		"stream_key":  a.cfg.StreamKey,
+		"drone_key":   a.cfg.DroneKey,
+		"local_ip":    localIP(),
+		"ingest_url":  fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.StreamKey),
+		"drone_url":   fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.DroneKey),
+		"hls_url":     fmt.Sprintf("http://127.0.0.1:%d/hls/live/%s.m3u8", a.cfg.WebPort, a.cfg.StreamKey),
+		"drone_hls":   fmt.Sprintf("http://127.0.0.1:%d/hls/live/%s.m3u8", a.cfg.WebPort, a.cfg.DroneKey),
+		"rtmp_play":   fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.StreamKey),
+		"drone_play":  fmt.Sprintf("rtmp://%s:%d/live/%s", host, a.cfg.RTMPPort, a.cfg.DroneKey),
+		"srs_binary":  a.manager.binaryPath(),
 	})
 }
 
@@ -456,7 +466,7 @@ func loadConfig(configPath, dataDir string) (Config, Paths, error) {
 	if err := os.MkdirAll(filepath.Dir(configPath), 0o700); err != nil {
 		return Config{}, Paths{}, err
 	}
-	cfg := Config{RTMPPort: 1935, HLSPort: 8080, WebPort: 17890, StreamKey: randomKey()}
+	cfg := Config{RTMPPort: 1935, HLSPort: 8080, WebPort: 17890, StreamKey: randomKey(), DroneKey: randomKey()}
 	data, err := os.ReadFile(configPath)
 	if errors.Is(err, os.ErrNotExist) {
 		return cfg, paths, nil
@@ -469,6 +479,9 @@ func loadConfig(configPath, dataDir string) (Config, Paths, error) {
 	}
 	if strings.TrimSpace(cfg.StreamKey) == "" {
 		cfg.StreamKey = randomKey()
+	}
+	if strings.TrimSpace(cfg.DroneKey) == "" {
+		cfg.DroneKey = randomKey()
 	}
 	if err := normalizeConfig(&cfg); err != nil {
 		return Config{}, Paths{}, err
@@ -500,6 +513,9 @@ func normalizeConfig(cfg *Config) error {
 	}
 	if strings.TrimSpace(cfg.StreamKey) == "" {
 		cfg.StreamKey = randomKey()
+	}
+	if strings.TrimSpace(cfg.DroneKey) == "" {
+		cfg.DroneKey = randomKey()
 	}
 	return nil
 }

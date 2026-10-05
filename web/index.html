@@ -54,17 +54,36 @@
           <div class="card-title">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <div>
-              <h2>Publicar desde la Osmo</h2>
-              <p class="card-subtitle">RTMP ingest</p>
+              <h2>Publicar (Ingest RTMP)</h2>
+              <p class="card-subtitle">Dos claves · Una sola URL base</p>
             </div>
           </div>
           <span class="pill">H.264 · 1080p60</span>
         </header>
-        <p class="help">En la cámara usa estos datos. La clave identifica tu stream y no necesitas cambiarla.</p>
-        <label for="serverUrl">Servidor RTMP</label>
-        <div class="copy-row"><input id="serverUrl" readonly><button class="btn-copy" data-copy="serverUrl" aria-label="Copiar servidor RTMP">Copiar</button></div>
-        <label for="streamKey">Stream key</label>
-        <div class="copy-row"><input id="streamKey" readonly><button class="btn-copy" data-copy="streamKey" aria-label="Copiar stream key">Copiar</button></div>
+        <p class="help">Usa la misma URL de servidor con claves distintas. La clave identifica cada cámara.</p>
+        
+        <div class="source-block">
+          <h3 class="source-name">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Osmo Pocket 3
+          </h3>
+          <label for="serverUrl">Servidor RTMP</label>
+          <div class="copy-row"><input id="serverUrl" readonly><button class="btn-copy" data-copy="serverUrl" aria-label="Copiar servidor RTMP">Copiar</button></div>
+          <label for="streamKey">Stream key (Osmo)</label>
+          <div class="copy-row"><input id="streamKey" readonly><button class="btn-copy" data-copy="streamKey" aria-label="Copiar stream key Osmo">Copiar</button></div>
+        </div>
+
+        <div class="source-block">
+          <h3 class="source-name">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 3l-7 7-3-3-7 7"/><path d="M3 21h18"/><path d="M12 3v18"/></svg>
+            Dron (DJI Avata / FPV)
+          </h3>
+          <label for="droneServerUrl">Servidor RTMP</label>
+          <div class="copy-row"><input id="droneServerUrl" readonly><button class="btn-copy" data-copy="droneServerUrl" aria-label="Copiar servidor RTMP dron">Copiar</button></div>
+          <label for="droneKey">Stream key (Dron)</label>
+          <div class="copy-row"><input id="droneKey" readonly><button class="btn-copy" data-copy="droneKey" aria-label="Copiar stream key dron">Copiar</button></div>
+        </div>
+
         <div class="presets">
           <span class="preset"><b>Resolución</b> 1920 × 1080</span>
           <span class="preset"><b>FPS</b> 60</span>
@@ -86,11 +105,24 @@
           </div>
           <span class="pill pill-green">Salida local</span>
         </header>
-        <p class="help">En OBS añade una fuente <b>VLC Video Source</b> y pega esta URL RTMP.</p>
-        <label for="playUrl">URL RTMP de reproducción</label>
-        <div class="copy-row"><input id="playUrl" readonly><button class="btn-copy" data-copy="playUrl" aria-label="Copiar URL RTMP">Copiar</button></div>
-        <label for="hlsUrl">URL HLS del navegador</label>
-        <div class="copy-row"><input id="hlsUrl" readonly><button class="btn-copy" data-copy="hlsUrl" aria-label="Copiar URL HLS">Copiar</button></div>
+        <p class="help">En OBS añade una fuente <b>VLC Video Source</b> y pega la URL RTMP de la cámara que quieras ver.</p>
+        
+        <div class="source-block">
+          <h3 class="source-name">Osmo Pocket 3</h3>
+          <label for="playUrl">URL RTMP de reproducción</label>
+          <div class="copy-row"><input id="playUrl" readonly><button class="btn-copy" data-copy="playUrl" aria-label="Copiar URL RTMP Osmo">Copiar</button></div>
+          <label for="hlsUrl">URL HLS del navegador</label>
+          <div class="copy-row"><input id="hlsUrl" readonly><button class="btn-copy" data-copy="hlsUrl" aria-label="Copiar URL HLS Osmo">Copiar</button></div>
+        </div>
+
+        <div class="source-block">
+          <h3 class="source-name">Dron (DJI Avata / FPV)</h3>
+          <label for="dronePlayUrl">URL RTMP de reproducción</label>
+          <div class="copy-row"><input id="dronePlayUrl" readonly><button class="btn-copy" data-copy="dronePlayUrl" aria-label="Copiar URL RTMP dron">Copiar</button></div>
+          <label for="droneHlsUrl">URL HLS del navegador</label>
+          <div class="copy-row"><input id="droneHlsUrl" readonly><button class="btn-copy" data-copy="droneHlsUrl" aria-label="Copiar URL HLS dron">Copiar</button></div>
+        </div>
+
         <p class="tip">La URL HLS también se puede abrir directamente en VLC.</p>
       </article>
     </section>
@@ -112,8 +144,12 @@
           <strong id="srsStatus" class="status-value">—</strong>
         </div>
         <div class="status-item">
-          <span class="status-label">Stream key</span>
+          <span class="status-label">Stream key (Osmo)</span>
           <strong id="keyStatus" class="status-value">—</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Stream key (Dron)</span>
+          <strong id="droneKeyStatus" class="status-value">—</strong>
         </div>
         <div class="status-item">
           <span class="status-label">IP del equipo</span>

@@ -83,12 +83,18 @@ async function refresh() {
     state.querySelector("strong").textContent = status.running ? "Servidor activo" : status.error ? "SRS no disponible" : "Comprobando servidor…";
     $("srsStatus").textContent = status.running ? "Activo" : "Detenido";
     $("keyStatus").textContent = status.stream_key || "—";
+    $("droneKeyStatus").textContent = status.drone_key || "—";
     $("errorStatus").textContent = status.error || "—";
     $("ipStatus").textContent = status.local_ip || "No detectada";
     $("serverUrl").value = status.ingest_url || "";
     $("streamKey").value = status.stream_key || "";
     $("playUrl").value = status.rtmp_play || "";
     $("hlsUrl").value = status.hls_url || "";
+    // Drone fields
+    $("droneServerUrl").value = status.drone_url || "";
+    $("droneKey").value = status.drone_key || "";
+    $("dronePlayUrl").value = status.drone_play || "";
+    $("droneHlsUrl").value = status.drone_hls || "";
     $("startButton").disabled = !!status.running;
     $("stopButton").disabled = !status.running;
     if (status.stream_key) {

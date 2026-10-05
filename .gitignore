@@ -4,3 +4,8 @@ rtmp-web.exe
 *.log
 *.pid
 .DS_Store
+
+# SRS build artifacts
+srs-extracted/
+srs-setup.exe
+Astra Node Logo.png
