@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Astra Node</title>
+  <link rel="icon" type="image/png" href="Astra%20Node%20Logo.png">
+  <link rel="apple-touch-icon" href="Astra%20Node%20Logo.png">
   <link rel="stylesheet" href="styles.css">
   <script src="hls.min.js"></script>
   <script src="app.js" defer></script>
@@ -15,73 +17,124 @@
         <img src="Astra Node Logo.png" alt="" class="logo" width="40" height="40" aria-hidden="true">
         <div>
           <h1>Astra Node</h1>
-          <p class="subtitle">Tu señal Osmo, en el navegador</p>
+          <p class="subtitle">Dos fuentes en directo · una Osmo y un dron</p>
         </div>
       </div>
-      <div id="serviceState" class="state state-loading" aria-live="polite">
-        <span class="state-dot"></span>
-        <strong>Comprobando servidor…</strong>
-      </div>
-    </header>
-
-    <section class="player-section">
-      <div class="video-wrap">
-        <video id="player" controls autoplay muted playsinline></video>
-        <div id="videoMessage" class="video-message" aria-live="polite">Esperando señal de la Osmo…</div>
-      </div>
-      <div class="player-footer">
-        <div class="stream-info">
-          <strong id="streamTitle">Sin stream activo</strong>
-          <span id="streamMeta">Configura la Osmo para comenzar</span>
-        </div>
-        <div id="streamDetails" class="stream-details" hidden>
-          <span class="detail"><span class="detail-label">Resolución:</span><span id="detailResolution" class="detail-value">—</span></span>
-          <span class="detail"><span class="detail-label">FPS:</span><span id="detailFps" class="detail-value">—</span></span>
-          <span class="detail"><span class="detail-label">Video:</span><span id="detailVcodec" class="detail-value">—</span></span>
-          <span class="detail"><span class="detail-label">Audio:</span><span id="detailAcodec" class="detail-value">—</span></span>
-          <span class="detail"><span class="detail-label">Bitrate:</span><span id="detailBitrate" class="detail-value">—</span></span>
+      <div class="topbar-actions">
+        <div id="serviceState" class="state state-loading" aria-live="polite">
+          <span class="state-dot"></span>
+          <strong>Comprobando servidor…</strong>
         </div>
         <div class="actions">
-          <button id="startButton" class="btn btn-primary">Iniciar servidor</button>
+          <button id="startButton" class="btn btn-primary">Iniciar</button>
           <button id="stopButton" class="btn" disabled>Detener</button>
         </div>
       </div>
-    </section>
+    </header>
 
-    <section class="grid">
-      <article class="card card-publish">
+    <section class="sources-grid">
+      <!-- Dron · columna izquierda -->
+      <article class="source-panel" data-source="drone">
         <header class="card-header">
           <div class="card-title">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
             <div>
-              <h2>Publicar (Ingest RTMP)</h2>
-              <p class="card-subtitle">Dos claves · Una sola URL base</p>
+              <h2>Dron</h2>
+              <p class="card-subtitle">DJI Avata / FPV · ingest RTMP</p>
             </div>
           </div>
-          <span class="pill">H.264 · 1080p60</span>
+          <span id="badgeDrone" class="badge badge-idle" aria-live="polite">
+            <span class="badge-dot"></span><span class="badge-text">Sin señal</span>
+          </span>
         </header>
-        <p class="help">Usa la misma URL de servidor con claves distintas. La clave identifica cada cámara.</p>
-        
-        <div class="source-block">
-          <h3 class="source-name">
-            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            Osmo Pocket 3
-          </h3>
-          <label for="serverUrl">Servidor RTMP</label>
-          <div class="copy-row"><input id="serverUrl" readonly><button class="btn-copy" data-copy="serverUrl" aria-label="Copiar servidor RTMP">Copiar</button></div>
-          <label for="streamKey">Stream key (Osmo)</label>
-          <div class="copy-row"><input id="streamKey" readonly><button class="btn-copy" data-copy="streamKey" aria-label="Copiar stream key Osmo">Copiar</button></div>
+
+        <div class="video-wrap">
+          <video id="playerDrone" controls autoplay muted playsinline></video>
+          <div id="msgDrone" class="video-message">Esperando señal del dron…</div>
         </div>
 
-        <div class="source-block">
-          <h3 class="source-name">
-            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 3l-7 7-3-3-7 7"/><path d="M3 21h18"/><path d="M12 3v18"/></svg>
-            Dron (DJI Avata / FPV)
-          </h3>
+        <div class="panel-stats">
+          <div class="stat"><span class="stat-label">Resolución</span><strong id="statDroneResolution" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">FPS</span><strong id="statDroneFps" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Video</span><strong id="statDroneVcodec" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Audio</span><strong id="statDroneAcodec" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Bitrate</span><strong id="statDroneBitrate" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Espectadores</span><strong id="statDroneClients" class="stat-value">—</strong></div>
+        </div>
+        <p id="noteDrone" class="panel-note" hidden></p>
+
+        <div class="panel-section">
+          <h3 class="section-title">Publicar (ingest RTMP)</h3>
           <label for="droneServerUrl">Servidor RTMP</label>
-          <div class="copy-row"><input id="droneServerUrl" readonly><button class="btn-copy" data-copy="droneServerUrl" aria-label="Copiar servidor RTMP dron">Copiar</button></div>
-          <label for="droneKey">Stream key (Dron)</label>
-          <div class="copy-row"><input id="droneKey" readonly><button class="btn-copy" data-copy="droneKey" aria-label="Copiar stream key dron">Copiar</button></div>
+          <div class="copy-row"><input id="droneServerUrl" readonly><button class="btn-copy" data-copy="droneServerUrl" aria-label="Copiar servidor RTMP del dron">Copiar</button></div>
+          <label for="droneKey">Stream key</label>
+          <div class="copy-row"><input id="droneKey" readonly><button class="btn-copy" data-copy="droneKey" aria-label="Copiar stream key del dron">Copiar</button></div>
+        </div>
+
+        <div class="panel-section">
+          <h3 class="section-title">Recibir en OBS / VLC</h3>
+          <label for="dronePlayUrl">URL RTMP de reproducción</label>
+          <div class="copy-row"><input id="dronePlayUrl" readonly><button class="btn-copy" data-copy="dronePlayUrl" aria-label="Copiar URL RTMP del dron">Copiar</button></div>
+          <label for="droneHlsUrl">URL HLS del navegador</label>
+          <div class="copy-row"><input id="droneHlsUrl" readonly><button class="btn-copy" data-copy="droneHlsUrl" aria-label="Copiar URL HLS del dron">Copiar</button></div>
+          <a id="droneHlsLink" class="link-open" href="#" target="_blank" rel="noopener">Abrir el HLS del dron en una pestaña</a>
+        </div>
+
+        <div class="presets">
+          <span class="preset"><b>Resolución</b> 1920 × 1080</span>
+          <span class="preset"><b>FPS</b> 60</span>
+          <span class="preset"><b>Video</b> H.264</span>
+          <span class="preset"><b>Audio</b> AAC</span>
+          <span class="preset"><b>Bitrate</b> 20–24 Mbps</span>
+          <span class="preset"><b>GOP</b> 1 s</span>
+        </div>
+      </article>
+
+      <!-- Osmo · columna derecha -->
+      <article class="source-panel source-osmo" data-source="osmo">
+        <header class="card-header">
+          <div class="card-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div>
+              <h2>Osmo Pocket 3</h2>
+              <p class="card-subtitle">Cámara principal · ingest RTMP</p>
+            </div>
+          </div>
+          <span id="badgeOsmo" class="badge badge-idle" aria-live="polite">
+            <span class="badge-dot"></span><span class="badge-text">Sin señal</span>
+          </span>
+        </header>
+
+        <div class="video-wrap">
+          <video id="playerOsmo" controls autoplay muted playsinline></video>
+          <div id="msgOsmo" class="video-message">Esperando señal de la Osmo…</div>
+        </div>
+
+        <div class="panel-stats">
+          <div class="stat"><span class="stat-label">Resolución</span><strong id="statOsmoResolution" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">FPS</span><strong id="statOsmoFps" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Video</span><strong id="statOsmoVcodec" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Audio</span><strong id="statOsmoAcodec" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Bitrate</span><strong id="statOsmoBitrate" class="stat-value">—</strong></div>
+          <div class="stat"><span class="stat-label">Espectadores</span><strong id="statOsmoClients" class="stat-value">—</strong></div>
+        </div>
+        <p id="noteOsmo" class="panel-note" hidden></p>
+
+        <div class="panel-section">
+          <h3 class="section-title">Publicar (ingest RTMP)</h3>
+          <label for="osmoServerUrl">Servidor RTMP</label>
+          <div class="copy-row"><input id="osmoServerUrl" readonly><button class="btn-copy" data-copy="osmoServerUrl" aria-label="Copiar servidor RTMP de la Osmo">Copiar</button></div>
+          <label for="osmoKey">Stream key</label>
+          <div class="copy-row"><input id="osmoKey" readonly><button class="btn-copy" data-copy="osmoKey" aria-label="Copiar stream key de la Osmo">Copiar</button></div>
+        </div>
+
+        <div class="panel-section">
+          <h3 class="section-title">Recibir en OBS / VLC</h3>
+          <label for="osmoPlayUrl">URL RTMP de reproducción</label>
+          <div class="copy-row"><input id="osmoPlayUrl" readonly><button class="btn-copy" data-copy="osmoPlayUrl" aria-label="Copiar URL RTMP de la Osmo">Copiar</button></div>
+          <label for="osmoHlsUrl">URL HLS del navegador</label>
+          <div class="copy-row"><input id="osmoHlsUrl" readonly><button class="btn-copy" data-copy="osmoHlsUrl" aria-label="Copiar URL HLS de la Osmo">Copiar</button></div>
+          <a id="osmoHlsLink" class="link-open" href="#" target="_blank" rel="noopener">Abrir el HLS de la Osmo en una pestaña</a>
         </div>
 
         <div class="presets">
@@ -93,38 +146,6 @@
           <span class="preset"><b>GOP</b> 1–2 s</span>
         </div>
       </article>
-
-      <article class="card card-receive">
-        <header class="card-header">
-          <div class="card-title">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            <div>
-              <h2>Recibir en OBS / VLC</h2>
-              <p class="card-subtitle">RTMP playback · HLS</p>
-            </div>
-          </div>
-          <span class="pill pill-green">Salida local</span>
-        </header>
-        <p class="help">En OBS añade una fuente <b>VLC Video Source</b> y pega la URL RTMP de la cámara que quieras ver.</p>
-        
-        <div class="source-block">
-          <h3 class="source-name">Osmo Pocket 3</h3>
-          <label for="playUrl">URL RTMP de reproducción</label>
-          <div class="copy-row"><input id="playUrl" readonly><button class="btn-copy" data-copy="playUrl" aria-label="Copiar URL RTMP Osmo">Copiar</button></div>
-          <label for="hlsUrl">URL HLS del navegador</label>
-          <div class="copy-row"><input id="hlsUrl" readonly><button class="btn-copy" data-copy="hlsUrl" aria-label="Copiar URL HLS Osmo">Copiar</button></div>
-        </div>
-
-        <div class="source-block">
-          <h3 class="source-name">Dron (DJI Avata / FPV)</h3>
-          <label for="dronePlayUrl">URL RTMP de reproducción</label>
-          <div class="copy-row"><input id="dronePlayUrl" readonly><button class="btn-copy" data-copy="dronePlayUrl" aria-label="Copiar URL RTMP dron">Copiar</button></div>
-          <label for="droneHlsUrl">URL HLS del navegador</label>
-          <div class="copy-row"><input id="droneHlsUrl" readonly><button class="btn-copy" data-copy="droneHlsUrl" aria-label="Copiar URL HLS dron">Copiar</button></div>
-        </div>
-
-        <p class="tip">La URL HLS también se puede abrir directamente en VLC.</p>
-      </article>
     </section>
 
     <section class="card card-status">
@@ -133,7 +154,7 @@
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
           <div>
             <h2>Estado del servidor</h2>
-            <p class="card-subtitle">Diagnóstico en tiempo real</p>
+            <p class="card-subtitle">SRS · una sola instancia, dos claves</p>
           </div>
         </div>
         <button id="refreshButton" class="btn btn-subtle">Actualizar</button>
@@ -144,16 +165,16 @@
           <strong id="srsStatus" class="status-value">—</strong>
         </div>
         <div class="status-item">
-          <span class="status-label">Stream key (Osmo)</span>
-          <strong id="keyStatus" class="status-value">—</strong>
-        </div>
-        <div class="status-item">
-          <span class="status-label">Stream key (Dron)</span>
-          <strong id="droneKeyStatus" class="status-value">—</strong>
+          <span class="status-label">Fuentes activas</span>
+          <strong id="activeSources" class="status-value">—</strong>
         </div>
         <div class="status-item">
           <span class="status-label">IP del equipo</span>
           <strong id="ipStatus" class="status-value">Detectando…</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Estadísticas</span>
+          <strong id="statsStatus" class="status-value">—</strong>
         </div>
         <div class="status-item">
           <span class="status-label">Último error</span>
